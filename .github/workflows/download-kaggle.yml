@@ -10,26 +10,22 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Create Download folder
+    - name: Install Kaggle API
       run: |
-        mkdir -p Download
-
-    - name: Setup Kaggle API
-      run: |
-        mkdir -p ~/.kaggle
-        echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
-        chmod 600 ~/.kaggle/kaggle.json
         pip install kaggle
-
+        mkdir -p ~/.kaggle
+    - name: Configure Kaggle API
+      env:
+        KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+        KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+      run: |
+        echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+        chmod 600 ~/.kaggle/kaggle.json
     - name: Download dataset
       run: |
-        kaggle datasets download valakhorasani/divar-real-estate-dataset1m-persian-property-ads -p Download
-
-    - name: Commit and push with PAT
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}
-        git add Download/
-        git commit -m "Add downloaded dataset [skip ci]" || echo "No changes to commit"
-        git push origin HEAD:${{ github.ref_name }}
+        kaggle datasets download valakhorasani/divar-real-estate-dataset1m-persian-property-ads
+    - name: Upload dataset as artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: divar-dataset
+        path: divar-real-estate-dataset1m-persian-property-ads.zip
