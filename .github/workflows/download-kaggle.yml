@@ -35,8 +35,8 @@ jobs:
         mkdir -p dataset-folder
         mv divar-real-estate-dataset1m-persian-property-ads.zip dataset-folder/
     
-        - name: Commit and push to repository
-        run: |
+    - name: Commit and push to repository
+      run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add dataset-folder/
