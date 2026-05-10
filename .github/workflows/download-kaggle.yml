@@ -13,6 +13,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Create Download folder
+      run: |
+        mkdir -p Download
+
     - name: Setup Kaggle API
       run: |
         mkdir -p ~/.kaggle
@@ -20,14 +24,14 @@ jobs:
         chmod 600 ~/.kaggle/kaggle.json
         pip install kaggle
 
-    - name: Download dataset
+    - name: Download dataset into the Download folder
       run: |
-        kaggle datasets download valakhorasani/divar-real-estate-dataset1m-persian-property-ads
-        echo "✅ Download completed!"
+        kaggle datasets download valakhorasani/divar-real-estate-dataset1m-persian-property-ads -p Download
 
-    - name: Upload as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: divar-dataset
-        path: divar-real-estate-dataset1m-persian-property-ads.zip
-        if-no-files-found: error
+    - name: Commit and push the downloaded file
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add Download/
+        git commit -m "Add downloaded dataset to Download folder [skip ci]" || echo "No changes to commit"
+        git push
