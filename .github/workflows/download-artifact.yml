@@ -1,0 +1,31 @@
+name: Download Artifact from Repo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download artifact using official action
+      uses: actions/download-artifact@v8
+      with:
+        name: divar-dataset
+        path: ./downloaded-file
+
+    - name: Show what we got
+      run: |
+        ls -la ./downloaded-file
+        # اگه فایل دوباره زیپ شده بود، اینجا unzipش کن
+        cd ./downloaded-file
+        if [ -f "divar-real-estate-dataset1m-persian-property-ads.zip" ]; then
+          echo "فایل پیدا شد!"
+          # اگه بازم زیپ بود، دوباره unzip کن
+          unzip -o divar-real-estate-dataset1m-persian-property-ads.zip -c > actual-file.zip 2>/dev/null || true
+        fi
