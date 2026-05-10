@@ -1,0 +1,34 @@
+name: Download Kaggle Dataset
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Kaggle API
+      run: |
+        pip install kaggle
+        mkdir -p ~/.kaggle
+
+    - name: Configure Kaggle API
+      env:
+        KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+        KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+      run: |
+        echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+        chmod 600 ~/.kaggle/kaggle.json
+
+    - name: Download dataset
+      run: |
+        kaggle datasets download valakhorasani/divar-real-estate-dataset1m-persian-property-ads
+
+    - name: Upload dataset as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: divar-dataset
+        path: divar-real-estate-dataset1m-persian-property-ads.zip
