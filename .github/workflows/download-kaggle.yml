@@ -3,6 +3,10 @@ name: Download Kaggle Dataset
 on:
   workflow_dispatch:
 
+# ⭐ مهم: در این بخش، دسترسی توکن را افزایش می‌دهیم
+permissions:
+  contents: write
+
 jobs:
   download:
     runs-on: ubuntu-latest
@@ -13,6 +17,7 @@ jobs:
     - name: Setup Kaggle credentials
       run: |
         mkdir -p ~/.kaggle
+        # توجه: متغیرها باید با نام قبلی تطابق داشته باشند
         echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
         chmod 600 ~/.kaggle/kaggle.json
         pip install kaggle
@@ -21,7 +26,6 @@ jobs:
       run: |
         kaggle datasets download valakhorasani/divar-real-estate-dataset1m-persian-property-ads
 
-    # مرحله جدید: فایل ZIP دانلود شده را به مخزن اضافه کن
     - name: Commit and push the dataset to the repository
       run: |
         git config --global user.name "github-actions[bot]"
@@ -29,5 +33,3 @@ jobs:
         git add divar-real-estate-dataset1m-persian-property-ads.zip
         git commit -m "Add downloaded dataset [skip ci]" || echo "No changes to commit"
         git push
-
-    # مرحله قبلی (آپلود به عنوان Artifact) را حذف کردم
