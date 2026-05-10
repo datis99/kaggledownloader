@@ -10,25 +10,24 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install Kaggle API
+    - name: Setup Kaggle credentials
       run: |
-        pip install kaggle
         mkdir -p ~/.kaggle
-
-    - name: Configure Kaggle API
-      env:
-        KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-        KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
-      run: |
-        echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+        echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
         chmod 600 ~/.kaggle/kaggle.json
+        pip install kaggle
 
-    - name: Download dataset
+    - name: Download the dataset
       run: |
         kaggle datasets download valakhorasani/divar-real-estate-dataset1m-persian-property-ads
 
-    - name: Upload dataset as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: divar-dataset
-        path: divar-real-estate-dataset1m-persian-property-ads.zip
+    # مرحله جدید: فایل ZIP دانلود شده را به مخزن اضافه کن
+    - name: Commit and push the dataset to the repository
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add divar-real-estate-dataset1m-persian-property-ads.zip
+        git commit -m "Add downloaded dataset [skip ci]" || echo "No changes to commit"
+        git push
+
+    # مرحله قبلی (آپلود به عنوان Artifact) را حذف کردم
