@@ -39,6 +39,7 @@ jobs:
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git pull origin main --rebase
         git add dataset-folder/
         git commit -m "Add dataset directly to repo [skip ci]" || echo "No changes to commit"
-        git push --force origin HEAD:main
+        git push origin HEAD:main
